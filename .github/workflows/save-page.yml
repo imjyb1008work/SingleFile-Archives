@@ -39,7 +39,8 @@ jobs:
           echo "Files in archives/$MONTH/:"
           ls -la archives/$MONTH/ 2>/dev/null || echo "Directory empty or not found"
           
-          echo "<html><body style='font-family:sans-serif;padding:20px;'><h1>Archives Index</h1><ul>" > index.html
+          echo "<html><body style='font-family:sans-serif;padding:20px;'><h1>Archives Index</h1>" > index.html
+          echo "<h2>$MONTH</h2><ul>" >> index.html
           ls archives/$MONTH/*.html 2>/dev/null | sort -r | xargs -I {} echo "<li><a href='./{}'>{}</a></li>" >> index.html
           echo "</ul></body></html>" >> index.html
           

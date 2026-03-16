@@ -15,10 +15,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # 切換到 gh-pages 分支，如果不存在則會基於 main 建立
           ref: 'gh-pages'
-          # 如果這是第一次跑，還沒有 gh-pages 分支，請先手動建立或將此行註解掉
-        continue-on-error: true # 第一次執行若無此分支則跳過
+        continue-on-error: true
+
+      - name: Copy archives from main
+        run: |
+          git fetch origin main
+          mkdir -p archives
+          git checkout origin/main -- archives/
 
       - name: Ensure Directory Structure
         run: mkdir -p archives
@@ -48,5 +52,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add .
           git commit -m "Auto save to gh-pages: $(date +'%Y-%m-%d %H:%M')" || exit 0
-          # 強制推送到 gh-pages 分支
           git push origin HEAD:gh-pages

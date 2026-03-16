@@ -30,10 +30,17 @@ jobs:
           
       - name: Generate Index Page
         run: |
+          MONTH=$(date +%Y%m)
+          echo "Processing month: $MONTH"
+          echo "Files in archives/$MONTH/:"
+          ls -la archives/$MONTH/ 2>/dev/null || echo "Directory empty or not found"
+          
           echo "<html><body style='font-family:sans-serif;padding:20px;'><h1>Archives Index</h1><ul>" > index.html
-          # 建立連結，指向 archives 資料夾內的檔案
-          ls archives/202603/*.html 2>/dev/null | sort -r | xargs -I {} echo "<li><a href='./{}'>{}</a></li>" >> index.html
+          ls archives/$MONTH/*.html 2>/dev/null | sort -r | xargs -I {} echo "<li><a href='./{}'>{}</a></li>" >> index.html
           echo "</ul></body></html>" >> index.html
+          
+          echo "Generated index.html:"
+          cat index.html
 
       - name: Commit and Push to gh-pages
         run: |

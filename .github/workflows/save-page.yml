@@ -27,23 +27,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-
-      - name: Install SingleFile CLI
-        run: |
-          npm install -g "single-file-cli"
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser
-
-      - name: Run SingleFile
-        run: |
-          # 存檔至 archives 目錄下
-          single-file "https://github.com/imjyb1008work/SingleFile-Archives" "./archives/page-$(date +'%Y%m%d_%H%M%S').html" --browser-executable-path=$(which chromium-browser)
-
+          
       - name: Generate Index Page
         run: |
           echo "<html><body style='font-family:sans-serif;padding:20px;'><h1>Archives Index</h1><ul>" > index.html
           # 建立連結，指向 archives 資料夾內的檔案
-          ls archives/$(date +%Y%m)/*.html 2>/dev/null | sort -r | xargs -I {} echo "<li><a href='./{}'>{}</a></li>" >> index.html
+          ls archives/202603/*.html 2>/dev/null | sort -r | xargs -I {} echo "<li><a href='./{}'>{}</a></li>" >> index.html
           echo "</ul></body></html>" >> index.html
 
       - name: Commit and Push to gh-pages

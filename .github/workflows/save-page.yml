@@ -1,0 +1,15 @@
+- name: Generate Index Page
+        run: |
+          echo "<html><body style='font-family: sans-serif; padding: 20px;'>" > index.html
+          echo "<h1>網頁存檔列表</h1><ul>" >> index.html
+          # 掃描 archives 資料夾下的所有 html 檔案並產生連結
+          ls archives/*.html | sort -r | xargs -I {} echo "<li><a href='./{}'>{}</a></li>" >> index.html
+          echo "</ul></body></html>" >> index.html
+
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Update archive and index: $(date +'%Y-%m-%d')" || exit 0
+          git push

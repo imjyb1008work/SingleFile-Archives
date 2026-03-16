@@ -43,7 +43,7 @@ jobs:
         run: |
           echo "<html><body style='font-family:sans-serif;padding:20px;'><h1>Archives Index</h1><ul>" > index.html
           # 建立連結，指向 archives 資料夾內的檔案
-          ls archives/*.html | sort -r | xargs -I {} echo "<li><a href='./{}'>{}</a></li>" >> index.html
+          ls archives/$(date +%Y%m)/*.html 2>/dev/null | sort -r | xargs -I {} echo "<li><a href='./{}'>{}</a></li>" >> index.html
           echo "</ul></body></html>" >> index.html
 
       - name: Commit and Push to gh-pages

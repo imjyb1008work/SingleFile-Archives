@@ -3,7 +3,7 @@ name: Auto Save Webpage with SingleFile
 on:
   workflow_dispatch:      # 允許手動點擊執行
   schedule:
-    - cron: '0 0 * * *'   # 每天凌晨執行
+    - cron: '* * * * *'   # 每天凌晨執行
 
 jobs:
   build:
@@ -32,7 +32,7 @@ jobs:
       - name: Run SingleFile
         run: |
           # 請將 URL 換成你想抓取的網址
-          single-file "https://example.com" "./archives/page-$(date +'%Y%m%d').html" --browser-executable-path=$(which chromium-browser)
+          single-file "https://github.com/imjyb1008work/SingleFile-Archives" "./archives/page-$(date +'%Y%m%d').html" --browser-executable-path=$(which chromium-browser)
 
       - name: Generate Index Page
         run: |

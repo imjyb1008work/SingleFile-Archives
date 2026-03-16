@@ -29,15 +29,10 @@ jobs:
       - name: Create archives directory
         run: mkdir -p archives
 
-      - name: Run SingleFile
-        run: |
-          # 請將 URL 換成你想抓取的網址
-          single-file "https://github.com/imjyb1008work/SingleFile-Archives" "./archives/page-$(date +'%Y%m%d').html" --browser-executable-path=$(which chromium-browser)
-
       - name: Generate Index Page
         run: |
           echo "<html><body style='font-family:sans-serif;padding:20px;'><h1>Archives</h1><ul>" > index.html
-          ls archives/*.html | sort -r | xargs -I {} echo "<li><a href='./{}'>{}</a></li>" >> index.html
+          ls archives/202603/*.html | sort -r | xargs -I {} echo "<li><a href='./{}'>{}</a></li>" >> index.html
           echo "</ul></body></html>" >> index.html
 
       - name: Commit and Push

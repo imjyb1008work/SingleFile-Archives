@@ -3,7 +3,7 @@ name: Auto Save Webpage with SingleFile
 on:
   workflow_dispatch:      # 允許手動點擊執行
   schedule:
-    - cron: '* * * * *'   # 每天凌晨執行
+    - cron: '*/5 * * * *'  # 每 5 分鐘執行一次
 
 jobs:
   build:

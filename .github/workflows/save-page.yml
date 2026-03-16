@@ -1,19 +1,27 @@
-name: Auto Save Webpage with SingleFile
+name: Auto Save Webpage to GitHub Pages
 
 on:
-  workflow_dispatch:      # 允許手動點擊執行
+  workflow_dispatch:
   schedule:
-    - cron: '*/5 * * * *'  # 每 5 分鐘執行一次
+    - cron: '*/10 * * * *'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:          # 這裡很重要，確保 Action 有寫入權限
+    permissions:
       contents: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # 切換到 gh-pages 分支，如果不存在則會基於 main 建立
+          ref: 'gh-pages'
+          # 如果這是第一次跑，還沒有 gh-pages 分支，請先手動建立或將此行註解掉
+        continue-on-error: true # 第一次執行若無此分支則跳過
+
+      - name: Ensure Directory Structure
+        run: mkdir -p archives
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -26,24 +34,23 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y chromium-browser
 
-      - name: Create archives directory
-        run: mkdir -p archives
-
       - name: Run SingleFile
         run: |
-          # 請將 URL 換成你想抓取的網址
-          single-file "https://github.com/imjyb1008work/SingleFile-Archives" "./archives/page-$(date +'%Y%m%d').html" --browser-executable-path=$(which chromium-browser)
+          # 存檔至 archives 目錄下
+          single-file "https://github.com/imjyb1008work/SingleFile-Archives" "./archives/page-$(date +'%Y%m%d_%H%M%S').html" --browser-executable-path=$(which chromium-browser)
 
       - name: Generate Index Page
         run: |
-          echo "<html><body style='font-family:sans-serif;padding:20px;'><h1>Archives</h1><ul>" > index.html
+          echo "<html><body style='font-family:sans-serif;padding:20px;'><h1>Archives Index</h1><ul>" > index.html
+          # 建立連結，指向 archives 資料夾內的檔案
           ls archives/*.html | sort -r | xargs -I {} echo "<li><a href='./{}'>{}</a></li>" >> index.html
           echo "</ul></body></html>" >> index.html
 
-      - name: Commit and Push
+      - name: Commit and Push to gh-pages
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .
-          git commit -m "Auto save: $(date +'%Y-%m-%d')" || exit 0
-          git push
+          git commit -m "Auto save to gh-pages: $(date +'%Y-%m-%d %H:%M')" || exit 0
+          # 強制推送到 gh-pages 分支
+          git push origin HEAD:gh-pages

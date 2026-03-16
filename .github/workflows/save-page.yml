@@ -1,15 +1,49 @@
-- name: Generate Index Page
+name: Auto Save Webpage with SingleFile
+
+on:
+  workflow_dispatch:      # 允許手動點擊執行
+  schedule:
+    - cron: '0 0 * * *'   # 每天凌晨執行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:          # 這裡很重要，確保 Action 有寫入權限
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Install SingleFile CLI
         run: |
-          echo "<html><body style='font-family: sans-serif; padding: 20px;'>" > index.html
-          echo "<h1>網頁存檔列表</h1><ul>" >> index.html
-          # 掃描 archives 資料夾下的所有 html 檔案並產生連結
+          npm install -g "single-file-cli"
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser
+
+      - name: Create archives directory
+        run: mkdir -p archives
+
+      - name: Run SingleFile
+        run: |
+          # 請將 URL 換成你想抓取的網址
+          single-file "https://example.com" "./archives/page-$(date +'%Y%m%d').html" --browser-executable-path=$(which chromium-browser)
+
+      - name: Generate Index Page
+        run: |
+          echo "<html><body style='font-family:sans-serif;padding:20px;'><h1>Archives</h1><ul>" > index.html
           ls archives/*.html | sort -r | xargs -I {} echo "<li><a href='./{}'>{}</a></li>" >> index.html
           echo "</ul></body></html>" >> index.html
 
-      - name: Commit and Push changes
+      - name: Commit and Push
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .
-          git commit -m "Update archive and index: $(date +'%Y-%m-%d')" || exit 0
+          git commit -m "Auto save: $(date +'%Y-%m-%d')" || exit 0
           git push
